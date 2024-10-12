@@ -1,0 +1,46 @@
+{
+  "Name": "CodeSwitch",
+  "ConsoleAppMenu": {
+    "MenuTitle": "**************************\n*     GUESTBOOK 2.0     *\n**************************",
+    "MenuPrompt": "Please Select The Number of Your Choice:",
+    "MenuItems": [
+      {
+        "Choice": 1,
+        "Text": "Sign the Guestbook",
+        "Action": "Sign",
+        "SubMenu": []
+      },
+      {
+        "Choice": 2,
+        "Text": "View the Geustbook",
+        "Action": "View",
+        "SubMenu": []
+      },
+      {
+        "Choice": 3,
+        "Text": "Manage the Guestbook",
+        "Action": "Manage",
+        "SubMenu": [
+          {
+            "MenuTitle": "**************************\n*     GUESTBOOK ADMIN     *\n**************************",
+            "MenuPrompt": "Please Select the Number of Your Choice: ",
+            "MenuItems": [
+              {
+                "Choice": 30,
+                "Text": "View the Guestbook",
+                "Action": "ViewAdmin",
+                "SubMenu": []
+              },
+              {
+                "Choice": 31,
+                "Text": "Close the Event",
+                "Action": "Close",
+                "SubMenu": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
