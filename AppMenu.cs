@@ -1,10 +1,7 @@
 ﻿using GloboWeb.Console.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using GloboWeb.Utility;
 
 namespace GloboWeb.Console;
 
@@ -76,8 +73,9 @@ public static class AppMenu
     {
         menu ??= _menu;
         Message.Write(menu.Title, true);
-        Message.Write(menu.Prompt, false);
         DisplayMenuItems(menu);
+        Message.BlankLine();
+        Message.Write(menu.Prompt, false, false);
     }
 
     private static void DisplayMenuItems(Menu menu)
@@ -88,11 +86,42 @@ public static class AppMenu
         }
     }
 
+    private static void DisplayActionItem(MenuItem menuItem,string parentTitle)
+    {
+        //Message.Write(GetParentTitle(menuItem.Choice), true);
+        Message.Write(parentTitle, true);
+        Message.Write($"*** {menuItem.Text} ***",false);
+        Message.BlankLine();
+    }
+
+    private static string? GetParentTitle(int choice, Menu? menu = null)
+    {
+        menu ??= _menu;
+
+        List<MenuItem>? items = menu.Items;
+        if (items == null) return null;
+
+        string? title = menu.Title;
+
+        foreach (var item in items) {
+
+            if (item.Choice == choice) return title;
+
+            if(item.Action == "SubMenu" && item.SubMenu != null && item.SubMenu.Items != null)
+            {
+                title = item.SubMenu.Title;
+                GetParentTitle(choice, item.SubMenu);
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>
-    /// Returns the first MenuItem found in _menu whose Choice = choice
+    /// Returns the first Menu found in _menu whose Choice = choice
     /// </summary>
     /// <param name="choice"></param>
-    /// <returns>The MenuItem if found, null otherwise</returns>
+    /// <returns>The Menu if found, null otherwise</returns>
     public static Menu? GetSubMenu(int choice, Menu? menu = null) 
     {
         menu ??= _menu;
@@ -110,5 +139,38 @@ public static class AppMenu
         }
 
         return null;
+    }
+
+    private static MenuItem? GetMenuItemChosen(Menu? menu = null)
+    {
+        menu ??= _menu;
+
+        (bool good, int choice) userInput = Prompt.GetInteger(" ");
+
+        MenuItem? menuItemChosen = null;
+
+        while (!userInput.good || (menu.Items != null && (menuItemChosen = menu.Items.FirstOrDefault(i => i.Choice == userInput.choice)) == null))
+        {
+            userInput = Prompt.GetInteger("That was not a valid option.  Please try again:  ");
+        }
+
+        return menuItemChosen;
+    }
+
+    public static string GetChoice()
+    {
+        MenuItem? menuItemChosen = GetMenuItemChosen();
+        string menuTitle = _menu.Title ?? string.Empty;
+
+        while(menuItemChosen != null && menuItemChosen.SubMenu != null) 
+        {
+            menuTitle = menuItemChosen.SubMenu.Title ?? string.Empty;
+            DisplayMenu(menuItemChosen.SubMenu);
+            menuItemChosen = GetMenuItemChosen(menuItemChosen.SubMenu);
+        }
+
+        DisplayActionItem(menuItemChosen!,menuTitle);
+
+        return menuItemChosen!.Action.ToLower();
     }
 }
