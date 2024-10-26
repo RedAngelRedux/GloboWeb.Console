@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\TimCorey_Mastercourse_CSharp_2024\MiniProjects\GloboWeb.Utility\GloboWeb.Utility.csproj" />
+    <ProjectReference Include="..\GloboWeb.Utility\GloboWeb.Utility.csproj" />
   </ItemGroup>
 
 </Project>
