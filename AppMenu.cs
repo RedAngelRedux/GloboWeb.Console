@@ -5,19 +5,21 @@ using GloboWeb.Utility;
 
 namespace GloboWeb.Console;
 
-public static class AppMenu
+public class AppMenu
 {
-    private static IConfiguration _configuration;
-    private static Menu _menu;
+    private IConfiguration _configuration;
+    private Menu _menu;
 
-    static AppMenu()
+    public AppMenu(IConfiguration configuration)
     {
         try
         {
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetParent(AppContext.BaseDirectory)!.FullName)
-                .AddJsonFile("appmenu.json")
-                .Build();
+            _configuration = configuration;
+            //string basepath = Directory.GetParent(AppContext.BaseDirectory)!.FullName;
+            //_configuration = new ConfigurationBuilder()
+            //    .SetBasePath(basepath)
+            //    //.AddJsonFile("appmenu.json")
+            //    .Build();
 
             _menu = BuildMenu();
         }
@@ -27,7 +29,7 @@ public static class AppMenu
         }
     }
 
-    private static Menu BuildMenu()
+    private Menu BuildMenu()
     {
         string? prompt = _configuration.GetSection("ConsoleAppMenu").GetSection("MenuPrompt").Value;
         prompt = (string.IsNullOrEmpty(prompt)) ? string.Empty : prompt;
@@ -44,11 +46,11 @@ public static class AppMenu
     /// <summary>
     /// Displays all menuds and sub-menus found in _menu
     /// </summary>
-    public static void DisplayJsonMenu()
+    public void DisplayJsonMenu()
     {
-        Message.Write(_menu.Title, true);
-        Message.Write(_menu.Prompt, false);
-        DisplayJsonMenuItems(_menu.Items!, 0);
+        Message.Write(_menu.MenuTitle, true);
+        Message.Write(_menu.MenuPrompt, false);
+        DisplayJsonMenuItems(_menu.MenuItems!, 0);
     }
 
     private static void DisplayJsonMenuItems(List<MenuItem> menuItemss, int level)
@@ -58,8 +60,8 @@ public static class AppMenu
             Message.Write(new string(' ', level * 2) + $"{item.Choice}. {item.Text}");
             if (item.SubMenu != null) 
             {
-                Message.Write(new string(' ', (level + 1) * 2) + item.SubMenu.Title);
-                DisplayJsonMenuItems(item.SubMenu.Items!, level + 1);
+                Message.Write(new string(' ', (level + 1) * 2) + item.SubMenu.MenuTitle);
+                DisplayJsonMenuItems(item.SubMenu.MenuItems!, level + 1);
             }
         }
     }
@@ -69,18 +71,18 @@ public static class AppMenu
     /// </summary>
     /// <param name="choice"></param>
     /// <returns>false if SubMenu was null, otherwise true</returns>
-    public static void DisplayMenu(Menu? menu = null)
+    public void DisplayMenu(Menu? menu = null)
     {
         menu ??= _menu;
-        Message.Write(menu.Title, true);
+        Message.Write(menu.MenuTitle, true);
         DisplayMenuItems(menu);
         Message.BlankLine();
-        Message.Write(menu.Prompt, false, false);
+        Message.Write(menu.MenuPrompt, false, false);
     }
 
     private static void DisplayMenuItems(Menu menu)
     {
-        foreach (var item in menu.Items!)
+        foreach (var item in menu.MenuItems!)
         {
             Message.Write($"{item.Choice}. {item.Text}");
         }
@@ -94,22 +96,22 @@ public static class AppMenu
         Message.BlankLine();
     }
 
-    private static string? GetParentTitle(int choice, Menu? menu = null)
+    private string? GetParentTitle(int choice, Menu? menu = null)
     {
         menu ??= _menu;
 
-        List<MenuItem>? items = menu.Items;
+        List<MenuItem>? items = menu.MenuItems;
         if (items == null) return null;
 
-        string? title = menu.Title;
+        string? title = menu.MenuTitle;
 
         foreach (var item in items) {
 
             if (item.Choice == choice) return title;
 
-            if(item.Action == "SubMenu" && item.SubMenu != null && item.SubMenu.Items != null)
+            if(item.Action == "SubMenu" && item.SubMenu != null && item.SubMenu.MenuItems != null)
             {
-                title = item.SubMenu.Title;
+                title = item.SubMenu.MenuTitle;
                 GetParentTitle(choice, item.SubMenu);
             }
         }
@@ -122,11 +124,11 @@ public static class AppMenu
     /// </summary>
     /// <param name="choice"></param>
     /// <returns>The Menu if found, null otherwise</returns>
-    public static Menu? GetSubMenu(int choice, Menu? menu = null) 
+    public Menu? GetSubMenu(int choice, Menu? menu = null) 
     {
         menu ??= _menu;
 
-        List<MenuItem>? items = menu.Items;
+        List<MenuItem>? items = menu.MenuItems;
 
         if (items == null) return null;
 
@@ -134,14 +136,14 @@ public static class AppMenu
         { 
             if(item.Choice == choice) return item.SubMenu;
 
-            if (item.Action == "SubMenu" && item.SubMenu != null && item.SubMenu.Items != null)
+            if (item.Action == "SubMenu" && item.SubMenu != null && item.SubMenu.MenuItems != null)
                 GetSubMenu(choice, item.SubMenu);
         }
 
         return null;
     }
 
-    private static MenuItem? GetMenuItemChosen(Menu? menu = null)
+    private MenuItem? GetMenuItemChosen(Menu? menu = null)
     {
         menu ??= _menu;
 
@@ -149,7 +151,7 @@ public static class AppMenu
 
         MenuItem? menuItemChosen = null;
 
-        while (!userInput.good || (menu.Items != null && (menuItemChosen = menu.Items.FirstOrDefault(i => i.Choice == userInput.choice)) == null))
+        while (!userInput.good || (menu.MenuItems != null && (menuItemChosen = menu.MenuItems.FirstOrDefault(i => i.Choice == userInput.choice)) == null))
         {
             userInput = Prompt.GetInteger("That was not a valid option.  Please try again:  ");
         }
@@ -157,14 +159,14 @@ public static class AppMenu
         return menuItemChosen;
     }
 
-    public static string GetChoice()
+    public string GetChoice()
     {
         MenuItem? menuItemChosen = GetMenuItemChosen();
-        string menuTitle = _menu.Title ?? string.Empty;
+        string menuTitle = _menu.MenuTitle ?? string.Empty;
 
         while(menuItemChosen != null && menuItemChosen.SubMenu != null) 
         {
-            menuTitle = menuItemChosen.SubMenu.Title ?? string.Empty;
+            menuTitle = menuItemChosen.SubMenu.MenuTitle ?? string.Empty;
             DisplayMenu(menuItemChosen.SubMenu);
             menuItemChosen = GetMenuItemChosen(menuItemChosen.SubMenu);
         }

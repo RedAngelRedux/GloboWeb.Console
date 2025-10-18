@@ -9,7 +9,7 @@ namespace GloboWeb.Console.Models;
 
 public class Menu()
 {
-    public string? Title { get; set; }
-    public string? Prompt { get; set; }
-    public List<MenuItem>? Items { get; set; }
+    public string? MenuTitle { get; set; }
+    public string? MenuPrompt { get; set; }
+    public List<MenuItem>? MenuItems { get; set; }
 }
