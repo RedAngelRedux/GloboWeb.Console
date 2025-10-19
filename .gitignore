@@ -1,48 +1,27 @@
-﻿# Ignore build directories
-bin/
-obj/
+﻿# Ignore all bin and obj folders recursively
+**/bin/
+**/obj/
+**/.vs/
 
-# Ignore user-specific files
-*.user
-*.suo
-
-# Ignore Visual Studio specific files
-.vs/
-.vscode/
-.vscode/*
-.idea/
-.idea/*
-.DS_Store
-
-# Ignore OS specific files
-*.DS_Store
-Thumbs.db
-
-# Ignore package management
-node_modules/
-packages/
-
-# Ignore logs
-*.log
-
-# Ignore temporary files
-*.tmp
-*.bak
-
-# Ignore coverage reports
-coverage/
-
-# Ignore build artifacts
+# Ignore build outputs
 *.dll
+*.pdb
 *.exe
-*.o
-*.so
 
-# Ignore .NET specific files
-project.lock.json
-project.fragment.lock.json
-artifacts/
+# Ignore NuGet-generated files
+project.assets.json
+project.nuget.cache
+*.csproj.nuget.g.props
+*.csproj.nuget.dgspec.json
 
-# Ignore dependency management
-.nuget/
-.env
+# Ignore MSBuild intermediate files
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.CoreCompileInputs.cache
+*.FileListAbsolute.txt
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.assets.cache
+
+# Ignore ref folders
+**/ref/
+**/refint/
