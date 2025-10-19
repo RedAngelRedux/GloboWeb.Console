@@ -11,7 +11,7 @@ namespace GloboWeb.Console;
 
 public static class Prompt
 {
-    private static bool DisplayPrompt(string prompt,bool enter, bool clear)
+    public static bool Display(string prompt,bool enter, bool clear)
     {
         //if (string.IsNullOrWhiteSpace(prompt)) return false;
 
@@ -27,16 +27,43 @@ public static class Prompt
     {
         string? userInput = null;
 
-        if(DisplayPrompt(prompt,enter,clear)) userInput = System.Console.ReadLine();
+        if(Display(prompt,enter,clear)) userInput = System.Console.ReadLine();
 
         return userInput ?? string.Empty;
     }
 
     public static (bool good, int integer) GetInteger(string prompt, bool enter = false, bool clear = false)
     {
-        if(DisplayPrompt(prompt,enter,clear))  return GloboWeb.Utility.Validator.ParseInteger(System.Console.ReadLine());
+        if(Display(prompt,enter,clear))  return GloboWeb.Utility.Validator.ParseInteger(System.Console.ReadLine());
 
         return (false, -1);
+    }
+
+    public static bool TryAgain(string prompt = "Try again ('Y' or 'N')?")
+    {
+        bool gooResponse = false;
+        bool tryAgain = false;
+
+        while(!gooResponse)
+        { 
+            string userInput = GetString(prompt) ?? string.Empty;
+            if(userInput == "Y" || userInput ==  "y")
+            {
+                gooResponse = true;
+                tryAgain = true;
+            }
+            if(userInput == "N" || userInput == "n")
+            {
+                gooResponse = true;
+                tryAgain = false;
+            }
+            if (!gooResponse)
+            {
+                Display("Invalid choice.  Please enter a valid response.",true,false);
+            }
+        }
+
+        return tryAgain;
     }
 
     public static void Pause(
@@ -44,7 +71,7 @@ public static class Prompt
         bool enter = false, 
         bool clear = false)
     {
-        DisplayPrompt(prompt,enter,clear);
+        Display(prompt,enter,clear);
         System.Console.ReadKey();
     }
 }
