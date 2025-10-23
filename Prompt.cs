@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using GloboWeb.Utility;
-
-namespace GloboWeb.Console;
+﻿namespace GloboWeb.Console;
 
 public static class Prompt
 {
@@ -37,6 +28,15 @@ public static class Prompt
         if(Display(prompt,enter,clear))  return GloboWeb.Utility.Validator.ParseInteger(System.Console.ReadLine());
 
         return (false, -1);
+    }
+
+    public static (bool good, int integer) GetIntegerRange(string prompt, int min, int max, bool enter = false, bool clear = false)
+    {
+        Display(prompt, enter, clear);
+        (bool good, int integer) = GloboWeb.Utility.Validator.ParseInteger(System.Console.ReadLine());
+
+        if (good && integer >= min && integer <= max) return (true, integer);
+        else return (false, -1);
     }
 
     public static bool TryAgain(string prompt = "Try again ('Y' or 'N')?")
